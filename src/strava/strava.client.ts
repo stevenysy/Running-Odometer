@@ -10,7 +10,17 @@ const stravaTokenResponseSchema = z.object({
   })
 });
 
+const stravaSummaryActivitySchema = z.object({
+  id: z.number().int().positive(),
+  distance: z.number().nonnegative(),
+  sport_type: z.string().min(1),
+  start_date: z.string().min(1)
+});
+
+const stravaSummaryActivitiesSchema = z.array(stravaSummaryActivitySchema);
+
 export type StravaTokenResponse = z.infer<typeof stravaTokenResponseSchema>;
+export type StravaSummaryActivity = z.infer<typeof stravaSummaryActivitySchema>;
 
 export interface StravaClientConfig {
   clientId: string;
@@ -25,12 +35,20 @@ export interface RefreshAccessTokenInput {
   refreshToken: string;
 }
 
+export interface ListAthleteActivitiesInput {
+  accessToken: string;
+  page: number;
+  perPage: number;
+}
+
 export interface StravaClient {
   exchangeAuthorizationCode(input: ExchangeAuthorizationCodeInput): Promise<StravaTokenResponse>;
   refreshAccessToken(input: RefreshAccessTokenInput): Promise<StravaTokenResponse>;
+  listAthleteActivities(input: ListAthleteActivitiesInput): Promise<StravaSummaryActivity[]>;
 }
 
 const STRAVA_TOKEN_URL = 'https://www.strava.com/oauth/token';
+const STRAVA_API_BASE_URL = 'https://www.strava.com/api/v3';
 
 export function createStravaClient(config: StravaClientConfig): StravaClient {
   return {
@@ -49,6 +67,13 @@ export function createStravaClient(config: StravaClientConfig): StravaClient {
         grantType: 'refresh_token',
         refreshToken: input.refreshToken
       });
+    },
+    listAthleteActivities(input) {
+      return requestStravaApi(
+        `/athlete/activities?page=${input.page.toString()}&per_page=${input.perPage.toString()}`,
+        input.accessToken,
+        stravaSummaryActivitiesSchema
+      );
     }
   };
 }
@@ -85,7 +110,7 @@ async function requestToken(request: TokenRequest): Promise<StravaTokenResponse>
     body
   });
 
-  const payload: unknown = await response.json();
+  const payload = await readJsonPayload(response, 'Strava token response was not JSON');
 
   if (!response.ok) {
     throw new StravaApiError('Strava token request failed', response.status, payload);
@@ -102,6 +127,44 @@ async function requestToken(request: TokenRequest): Promise<StravaTokenResponse>
   }
 
   return parsed.data;
+}
+
+async function requestStravaApi<T>(
+  path: string,
+  accessToken: string,
+  schema: z.ZodSchema<T>
+): Promise<T> {
+  const response = await fetch(`${STRAVA_API_BASE_URL}${path}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  });
+
+  const payload = await readJsonPayload(response, 'Strava API response was not JSON');
+
+  if (!response.ok) {
+    throw new StravaApiError('Strava API request failed', response.status, payload);
+  }
+
+  const parsed = schema.safeParse(payload);
+
+  if (!parsed.success) {
+    throw new StravaApiError(
+      'Strava API response was invalid',
+      response.status,
+      parsed.error.flatten()
+    );
+  }
+
+  return parsed.data;
+}
+
+async function readJsonPayload(response: Response, message: string): Promise<unknown> {
+  try {
+    return await response.json();
+  } catch {
+    throw new StravaApiError(message, response.status, null);
+  }
 }
 
 export class StravaApiError extends Error {
