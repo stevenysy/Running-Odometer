@@ -1,7 +1,7 @@
 import type { AuthToken } from '@/db/schema';
-import { nowIso } from '@/lib/time';
-import type { StravaClient, StravaSummaryActivity } from './strava.client';
+import type { StravaClient } from './strava.client';
 import type { ActivityRepository } from './activity.repository';
+import { isRunActivity, toStoredActivity } from './activity.mapper';
 
 const STRAVA_SYNC_PER_PAGE = 200;
 
@@ -44,13 +44,7 @@ export function createSyncService(
 
         for (const activity of stravaActivities) {
           if (isRunActivity(activity)) {
-            await activityRepository.upsertActivity({
-              stravaActivityId: activity.id,
-              distanceMeters: Math.round(activity.distance),
-              sportType: activity.sport_type,
-              startDate: activity.start_date,
-              updatedAt: nowIso()
-            });
+            await activityRepository.upsertActivity(toStoredActivity(activity));
             activitiesUpserted += 1;
           } else {
             const wasDeleted = await activityRepository.deleteActivity(activity.id);
@@ -80,8 +74,4 @@ export function createSyncService(
       };
     }
   };
-}
-
-function isRunActivity(activity: StravaSummaryActivity): boolean {
-  return activity.sport_type === 'Run' || activity.sport_type.endsWith('Run');
 }

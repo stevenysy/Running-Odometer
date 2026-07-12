@@ -41,10 +41,16 @@ export interface ListAthleteActivitiesInput {
   perPage: number;
 }
 
+export interface GetActivityInput {
+  accessToken: string;
+  activityId: number;
+}
+
 export interface StravaClient {
   exchangeAuthorizationCode(input: ExchangeAuthorizationCodeInput): Promise<StravaTokenResponse>;
   refreshAccessToken(input: RefreshAccessTokenInput): Promise<StravaTokenResponse>;
   listAthleteActivities(input: ListAthleteActivitiesInput): Promise<StravaSummaryActivity[]>;
+  getActivity(input: GetActivityInput): Promise<StravaSummaryActivity>;
 }
 
 const STRAVA_TOKEN_URL = 'https://www.strava.com/oauth/token';
@@ -73,6 +79,13 @@ export function createStravaClient(config: StravaClientConfig): StravaClient {
         `/athlete/activities?page=${input.page.toString()}&per_page=${input.perPage.toString()}`,
         input.accessToken,
         stravaSummaryActivitiesSchema
+      );
+    },
+    getActivity(input) {
+      return requestStravaApi(
+        `/activities/${input.activityId.toString()}?include_all_efforts=false`,
+        input.accessToken,
+        stravaSummaryActivitySchema
       );
     }
   };
