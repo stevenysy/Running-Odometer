@@ -4,11 +4,12 @@ const app = createApp();
 
 export default {
   fetch: app.fetch,
-  async scheduled(_event, env, ctx) {
-    ctx.waitUntil(runScheduledReconciliation(env));
+  scheduled(_event, _env, ctx) {
+    ctx.waitUntil(runScheduledReconciliation());
   }
 } satisfies ExportedHandler<Env>;
 
-async function runScheduledReconciliation(_env: Env): Promise<void> {
+function runScheduledReconciliation(): Promise<void> {
   // Implemented with the scheduled reconciliation feature.
+  return Promise.resolve();
 }

@@ -17,10 +17,11 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/no-floating-promises': 'error'
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
     }
   },
   {
-    ignores: ['dist', '.wrangler', 'node_modules', 'migrations']
+    ignores: ['dist', '.wrangler', 'node_modules', 'migrations', 'eslint.config.js']
   }
 );

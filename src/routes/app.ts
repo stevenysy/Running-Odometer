@@ -6,10 +6,10 @@ import { odometerRoutes } from '@/odometer/odometer.routes';
 import { syncRoutes } from '@/strava/sync.routes';
 import { webhookRoutes } from '@/webhook/webhook.routes';
 
-export type AppContext = {
+export interface AppContext {
   Bindings: Bindings;
   Variables: AppVariables;
-};
+}
 
 export function createApp(): Hono<AppContext> {
   const app = new Hono<AppContext>();
