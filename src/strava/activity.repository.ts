@@ -1,10 +1,11 @@
-import { eq } from 'drizzle-orm';
+import { eq, gte } from 'drizzle-orm';
 import type { DbClient } from '@/db/client';
 import { activities, type Activity, type NewActivity } from '@/db/schema';
 
 export interface ActivityRepository {
   upsertActivity(activity: NewActivity): Promise<void>;
   deleteActivity(stravaActivityId: number): Promise<boolean>;
+  listActivityIdsSince(startDate: string): Promise<number[]>;
 }
 
 export function createActivityRepository(db: DbClient): ActivityRepository {
@@ -33,6 +34,16 @@ export function createActivityRepository(db: DbClient): ActivityRepository {
       await db.delete(activities).where(eq(activities.stravaActivityId, stravaActivityId));
 
       return true;
+    },
+    async listActivityIdsSince(startDate) {
+      const rows = await db
+        .select({
+          stravaActivityId: activities.stravaActivityId
+        })
+        .from(activities)
+        .where(gte(activities.startDate, startDate));
+
+      return rows.map((row) => row.stravaActivityId);
     }
   };
 }

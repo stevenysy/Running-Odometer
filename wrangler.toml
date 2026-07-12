@@ -8,4 +8,4 @@ database_name = "running_odometer"
 database_id = "replace-with-cloudflare-d1-database-id"
 
 [triggers]
-crons = ["*/30 * * * *"]
+crons = ["0 */6 * * *"]

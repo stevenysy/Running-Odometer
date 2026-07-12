@@ -39,6 +39,7 @@ export interface ListAthleteActivitiesInput {
   accessToken: string;
   page: number;
   perPage: number;
+  after?: number;
 }
 
 export interface GetActivityInput {
@@ -75,8 +76,17 @@ export function createStravaClient(config: StravaClientConfig): StravaClient {
       });
     },
     listAthleteActivities(input) {
+      const searchParams = new URLSearchParams({
+        page: input.page.toString(),
+        per_page: input.perPage.toString()
+      });
+
+      if (input.after !== undefined) {
+        searchParams.set('after', input.after.toString());
+      }
+
       return requestStravaApi(
-        `/athlete/activities?page=${input.page.toString()}&per_page=${input.perPage.toString()}`,
+        `/athlete/activities?${searchParams.toString()}`,
         input.accessToken,
         stravaSummaryActivitiesSchema
       );
