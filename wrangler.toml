@@ -1,0 +1,11 @@
+name = "running-odometer"
+main = "src/index.ts"
+compatibility_date = "2024-12-30"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "running_odometer"
+database_id = "replace-with-cloudflare-d1-database-id"
+
+[triggers]
+crons = ["*/30 * * * *"]
