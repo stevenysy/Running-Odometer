@@ -1,10 +1,20 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const activities = sqliteTable('activities', {
   stravaActivityId: integer('strava_activity_id', { mode: 'number' }).primaryKey(),
   distanceMeters: integer('distance_meters').notNull(),
   sportType: text('sport_type').notNull(),
   startDate: text('start_date').notNull(),
+  name: text('name'),
+  movingTimeSeconds: integer('moving_time_seconds'),
+  elapsedTimeSeconds: integer('elapsed_time_seconds'),
+  elevationGainMeters: real('elevation_gain_meters'),
+  startDateLocal: text('start_date_local'),
+  timezone: text('timezone'),
+  averageSpeedMetersPerSecond: real('average_speed_meters_per_second'),
+  maxSpeedMetersPerSecond: real('max_speed_meters_per_second'),
+  averageHeartrate: real('average_heartrate'),
+  maxHeartrate: real('max_heartrate'),
   updatedAt: text('updated_at').notNull()
 });
 

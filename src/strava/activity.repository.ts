@@ -20,6 +20,16 @@ export function createActivityRepository(db: DbClient): ActivityRepository {
             distanceMeters: activity.distanceMeters,
             sportType: activity.sportType,
             startDate: activity.startDate,
+            name: activity.name,
+            movingTimeSeconds: activity.movingTimeSeconds,
+            elapsedTimeSeconds: activity.elapsedTimeSeconds,
+            elevationGainMeters: activity.elevationGainMeters,
+            startDateLocal: activity.startDateLocal,
+            timezone: activity.timezone,
+            averageSpeedMetersPerSecond: activity.averageSpeedMetersPerSecond,
+            maxSpeedMetersPerSecond: activity.maxSpeedMetersPerSecond,
+            averageHeartrate: activity.averageHeartrate,
+            maxHeartrate: activity.maxHeartrate,
             updatedAt: activity.updatedAt
           }
         });

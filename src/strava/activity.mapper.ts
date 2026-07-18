@@ -12,6 +12,16 @@ export function toStoredActivity(activity: StravaSummaryActivity): NewActivity {
     distanceMeters: Math.round(activity.distance),
     sportType: activity.sport_type,
     startDate: activity.start_date,
+    name: activity.name ?? null,
+    movingTimeSeconds: activity.moving_time ?? null,
+    elapsedTimeSeconds: activity.elapsed_time ?? null,
+    elevationGainMeters: activity.total_elevation_gain ?? null,
+    startDateLocal: activity.start_date_local ?? null,
+    timezone: activity.timezone ?? null,
+    averageSpeedMetersPerSecond: activity.average_speed ?? null,
+    maxSpeedMetersPerSecond: activity.max_speed ?? null,
+    averageHeartrate: activity.average_heartrate ?? null,
+    maxHeartrate: activity.max_heartrate ?? null,
     updatedAt: nowIso()
   };
 }
