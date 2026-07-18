@@ -1,10 +1,13 @@
 import { z } from 'zod';
 
-const stravaTokenResponseSchema = z.object({
+const stravaRefreshTokenResponseSchema = z.object({
   access_token: z.string().min(1),
   refresh_token: z.string().min(1),
   expires_at: z.number().int().positive(),
-  expires_in: z.number().int().nonnegative(),
+  expires_in: z.number().int().nonnegative()
+});
+
+const stravaTokenResponseSchema = stravaRefreshTokenResponseSchema.extend({
   athlete: z.object({
     id: z.number().int().positive()
   })
@@ -12,14 +15,25 @@ const stravaTokenResponseSchema = z.object({
 
 const stravaSummaryActivitySchema = z.object({
   id: z.number().int().positive(),
+  name: z.string().nullable().optional(),
   distance: z.number().nonnegative(),
+  moving_time: z.number().int().nonnegative().nullable().optional(),
+  elapsed_time: z.number().int().nonnegative().nullable().optional(),
+  total_elevation_gain: z.number().nonnegative().nullable().optional(),
   sport_type: z.string().min(1),
-  start_date: z.string().min(1)
+  start_date: z.string().min(1),
+  start_date_local: z.string().nullable().optional(),
+  timezone: z.string().nullable().optional(),
+  average_speed: z.number().nonnegative().nullable().optional(),
+  max_speed: z.number().nonnegative().nullable().optional(),
+  average_heartrate: z.number().nonnegative().nullable().optional(),
+  max_heartrate: z.number().nonnegative().nullable().optional()
 });
 
 const stravaSummaryActivitiesSchema = z.array(stravaSummaryActivitySchema);
 
 export type StravaTokenResponse = z.infer<typeof stravaTokenResponseSchema>;
+export type StravaRefreshTokenResponse = z.infer<typeof stravaRefreshTokenResponseSchema>;
 export type StravaSummaryActivity = z.infer<typeof stravaSummaryActivitySchema>;
 
 export interface StravaClientConfig {
@@ -49,7 +63,7 @@ export interface GetActivityInput {
 
 export interface StravaClient {
   exchangeAuthorizationCode(input: ExchangeAuthorizationCodeInput): Promise<StravaTokenResponse>;
-  refreshAccessToken(input: RefreshAccessTokenInput): Promise<StravaTokenResponse>;
+  refreshAccessToken(input: RefreshAccessTokenInput): Promise<StravaRefreshTokenResponse>;
   listAthleteActivities(input: ListAthleteActivitiesInput): Promise<StravaSummaryActivity[]>;
   getActivity(input: GetActivityInput): Promise<StravaSummaryActivity>;
 }
@@ -60,20 +74,26 @@ const STRAVA_API_BASE_URL = 'https://www.strava.com/api/v3';
 export function createStravaClient(config: StravaClientConfig): StravaClient {
   return {
     exchangeAuthorizationCode(input) {
-      return requestToken({
-        clientId: config.clientId,
-        clientSecret: config.clientSecret,
-        grantType: 'authorization_code',
-        code: input.code
-      });
+      return requestToken(
+        {
+          clientId: config.clientId,
+          clientSecret: config.clientSecret,
+          grantType: 'authorization_code',
+          code: input.code
+        },
+        stravaTokenResponseSchema
+      );
     },
     refreshAccessToken(input) {
-      return requestToken({
-        clientId: config.clientId,
-        clientSecret: config.clientSecret,
-        grantType: 'refresh_token',
-        refreshToken: input.refreshToken
-      });
+      return requestToken(
+        {
+          clientId: config.clientId,
+          clientSecret: config.clientSecret,
+          grantType: 'refresh_token',
+          refreshToken: input.refreshToken
+        },
+        stravaRefreshTokenResponseSchema
+      );
     },
     listAthleteActivities(input) {
       const searchParams = new URLSearchParams({
@@ -115,7 +135,7 @@ type TokenRequest =
       refreshToken: string;
     };
 
-async function requestToken(request: TokenRequest): Promise<StravaTokenResponse> {
+async function requestToken<T>(request: TokenRequest, schema: z.ZodSchema<T>): Promise<T> {
   const body = new URLSearchParams({
     client_id: request.clientId,
     client_secret: request.clientSecret,
@@ -139,7 +159,7 @@ async function requestToken(request: TokenRequest): Promise<StravaTokenResponse>
     throw new StravaApiError('Strava token request failed', response.status, payload);
   }
 
-  const parsed = stravaTokenResponseSchema.safeParse(payload);
+  const parsed = schema.safeParse(payload);
 
   if (!parsed.success) {
     throw new StravaApiError(

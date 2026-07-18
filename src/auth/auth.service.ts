@@ -1,6 +1,10 @@
 import type { AuthToken } from '@/db/schema';
 import type { AuthTokenRepository } from './auth.repository';
-import type { StravaClient, StravaTokenResponse } from '@/strava/strava.client';
+import type {
+  StravaClient,
+  StravaRefreshTokenResponse,
+  StravaTokenResponse
+} from '@/strava/strava.client';
 
 export interface AuthService {
   completeOAuth(code: string): Promise<AuthTokenResult>;
@@ -43,10 +47,10 @@ export function createAuthService(
       const refreshedToken = await stravaClient.refreshAccessToken({
         refreshToken: existingToken.refreshToken
       });
-      await persistStravaToken(repository, refreshedToken);
+      await persistRefreshedStravaToken(repository, existingToken.athleteId, refreshedToken);
 
       return {
-        athleteId: refreshedToken.athlete.id,
+        athleteId: existingToken.athleteId,
         accessToken: refreshedToken.access_token,
         refreshToken: refreshedToken.refresh_token,
         expiresAt: stravaExpiresAtToDate(refreshedToken.expires_at),
@@ -62,6 +66,19 @@ async function persistStravaToken(
 ): Promise<void> {
   await repository.upsertToken({
     athleteId: token.athlete.id,
+    accessToken: token.access_token,
+    refreshToken: token.refresh_token,
+    expiresAt: stravaExpiresAtToDate(token.expires_at)
+  });
+}
+
+async function persistRefreshedStravaToken(
+  repository: AuthTokenRepository,
+  athleteId: number,
+  token: StravaRefreshTokenResponse
+): Promise<void> {
+  await repository.upsertToken({
+    athleteId,
     accessToken: token.access_token,
     refreshToken: token.refresh_token,
     expiresAt: stravaExpiresAtToDate(token.expires_at)
