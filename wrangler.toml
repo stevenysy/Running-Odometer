@@ -9,3 +9,7 @@ database_id = "1728cf29-fbb8-4175-8845-d5fafd8c47f4"
 
 [triggers]
 crons = ["0 */6 * * *"]
+
+[observability]
+enabled = true
+head_sampling_rate = 1
