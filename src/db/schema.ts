@@ -26,7 +26,16 @@ export const authTokens = sqliteTable('auth_tokens', {
   updatedAt: text('updated_at').notNull()
 });
 
+export const displayConfig = sqliteTable('display_config', {
+  id: text('id').primaryKey(),
+  nextRaceName: text('next_race_name'),
+  nextRaceDate: text('next_race_date'),
+  updatedAt: text('updated_at').notNull()
+});
+
 export type Activity = typeof activities.$inferSelect;
 export type NewActivity = typeof activities.$inferInsert;
 export type AuthToken = typeof authTokens.$inferSelect;
 export type NewAuthToken = typeof authTokens.$inferInsert;
+export type DisplayConfig = typeof displayConfig.$inferSelect;
+export type NewDisplayConfig = typeof displayConfig.$inferInsert;

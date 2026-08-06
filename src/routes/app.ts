@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import type { Bindings, AppVariables } from '@/types/env';
 import { authRoutes } from '@/auth/auth.routes';
+import { displayConfigRoutes } from '@/display-config/display-config.routes';
 import { odometerRoutes } from '@/odometer/odometer.routes';
 import { syncRoutes } from '@/strava/sync.routes';
 import { webhookRoutes } from '@/webhook/webhook.routes';
@@ -18,6 +19,7 @@ export function createApp(): Hono<AppContext> {
 
   app.route('/auth', authRoutes);
   app.route('/webhook', webhookRoutes);
+  app.route('/api', displayConfigRoutes);
   app.route('/api', odometerRoutes);
   app.route('/api/sync', syncRoutes);
 

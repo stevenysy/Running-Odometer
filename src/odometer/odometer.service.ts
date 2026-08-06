@@ -1,3 +1,5 @@
+import { toNextRaceResponse, type NextRaceResponse } from '@/display-config/display-config.service';
+import type { DisplayConfigRepository } from '@/display-config/display-config.repository';
 import type { OdometerRepository } from './odometer.repository';
 
 export interface OdometerService {
@@ -16,6 +18,7 @@ export interface OdometerResponse {
   averageSpeedMetersPerSecond: number | null;
   latestActivity: LatestActivityResponse | null;
   recent: RecentOdometerResponse;
+  nextRace: NextRaceResponse | null;
 }
 
 export interface LatestActivityResponse {
@@ -42,10 +45,16 @@ export interface RecentOdometerResponse {
   last30DaysActivityCount: number;
 }
 
-export function createOdometerService(repository: OdometerRepository): OdometerService {
+export function createOdometerService(
+  repository: OdometerRepository,
+  displayConfigRepository: DisplayConfigRepository
+): OdometerService {
   return {
     async getOdometer() {
-      const totals = await repository.getTotals();
+      const [totals, displayConfig] = await Promise.all([
+        repository.getTotals(),
+        displayConfigRepository.getConfig()
+      ]);
 
       return {
         distanceMeters: totals.distanceMeters,
@@ -89,7 +98,11 @@ export function createOdometerService(repository: OdometerRepository): OdometerS
           last30DaysDistanceMeters: totals.recent.last30DaysDistanceMeters,
           last30DaysDistanceKm: totals.recent.last30DaysDistanceMeters / 1000,
           last30DaysActivityCount: totals.recent.last30DaysActivityCount
-        }
+        },
+        nextRace: toNextRaceResponse(
+          displayConfig?.nextRaceName ?? null,
+          displayConfig?.nextRaceDate ?? null
+        )
       };
     }
   };
