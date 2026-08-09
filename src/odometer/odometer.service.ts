@@ -18,7 +18,9 @@ export interface OdometerResponse {
   averagePaceSecondsPerKm: number | null;
   averageSpeedMetersPerSecond: number | null;
   latestActivity: LatestActivityResponse | null;
+  longestActivity: LongestActivityResponse | null;
   recent: RecentOdometerResponse;
+  yearToDate: YearToDateOdometerResponse;
   nextRace: NextRaceResponse | null;
 }
 
@@ -39,6 +41,15 @@ export interface LatestActivityResponse {
   routePreview: RoutePreview | null;
 }
 
+export interface LongestActivityResponse {
+  id: number;
+  name: string | null;
+  distanceMeters: number;
+  distanceKm: number;
+  startDate: string;
+  startDateLocal: string | null;
+}
+
 export interface RecentOdometerResponse {
   last7DaysDistanceMeters: number;
   last7DaysDistanceKm: number;
@@ -46,6 +57,12 @@ export interface RecentOdometerResponse {
   last30DaysDistanceMeters: number;
   last30DaysDistanceKm: number;
   last30DaysActivityCount: number;
+}
+
+export interface YearToDateOdometerResponse {
+  distanceMeters: number;
+  distanceKm: number;
+  activityCount: number;
 }
 
 export function createOdometerService(
@@ -96,6 +113,16 @@ export function createOdometerService(
               routePreview: createRoutePreview(totals.latestActivity.summaryPolyline)
             }
           : null,
+        longestActivity: totals.longestActivity
+          ? {
+              id: totals.longestActivity.stravaActivityId,
+              name: totals.longestActivity.name,
+              distanceMeters: totals.longestActivity.distanceMeters,
+              distanceKm: totals.longestActivity.distanceMeters / 1000,
+              startDate: totals.longestActivity.startDate,
+              startDateLocal: totals.longestActivity.startDateLocal
+            }
+          : null,
         recent: {
           last7DaysDistanceMeters: totals.recent.last7DaysDistanceMeters,
           last7DaysDistanceKm: totals.recent.last7DaysDistanceMeters / 1000,
@@ -103,6 +130,11 @@ export function createOdometerService(
           last30DaysDistanceMeters: totals.recent.last30DaysDistanceMeters,
           last30DaysDistanceKm: totals.recent.last30DaysDistanceMeters / 1000,
           last30DaysActivityCount: totals.recent.last30DaysActivityCount
+        },
+        yearToDate: {
+          distanceMeters: totals.yearToDate.distanceMeters,
+          distanceKm: totals.yearToDate.distanceMeters / 1000,
+          activityCount: totals.yearToDate.activityCount
         },
         nextRace: toNextRaceResponse(
           displayConfig?.nextRaceName ?? null,
