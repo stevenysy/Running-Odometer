@@ -15,6 +15,7 @@ export const activities = sqliteTable('activities', {
   maxSpeedMetersPerSecond: real('max_speed_meters_per_second'),
   averageHeartrate: real('average_heartrate'),
   maxHeartrate: real('max_heartrate'),
+  summaryPolyline: text('summary_polyline'),
   updatedAt: text('updated_at').notNull()
 });
 

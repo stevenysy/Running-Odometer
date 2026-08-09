@@ -30,6 +30,7 @@ export function createActivityRepository(db: DbClient): ActivityRepository {
             maxSpeedMetersPerSecond: activity.maxSpeedMetersPerSecond,
             averageHeartrate: activity.averageHeartrate,
             maxHeartrate: activity.maxHeartrate,
+            summaryPolyline: activity.summaryPolyline,
             updatedAt: activity.updatedAt
           }
         });

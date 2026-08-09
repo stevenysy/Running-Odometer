@@ -27,7 +27,13 @@ const stravaSummaryActivitySchema = z.object({
   average_speed: z.number().nonnegative().nullable().optional(),
   max_speed: z.number().nonnegative().nullable().optional(),
   average_heartrate: z.number().nonnegative().nullable().optional(),
-  max_heartrate: z.number().nonnegative().nullable().optional()
+  max_heartrate: z.number().nonnegative().nullable().optional(),
+  map: z
+    .object({
+      summary_polyline: z.string().nullable().optional()
+    })
+    .nullable()
+    .optional()
 });
 
 const stravaSummaryActivitiesSchema = z.array(stravaSummaryActivitySchema);

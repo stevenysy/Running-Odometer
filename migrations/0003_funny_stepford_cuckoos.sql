@@ -1,0 +1,1 @@
+ALTER TABLE `activities` ADD `summary_polyline` text;

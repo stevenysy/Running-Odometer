@@ -1,6 +1,7 @@
 import { toNextRaceResponse, type NextRaceResponse } from '@/display-config/display-config.service';
 import type { DisplayConfigRepository } from '@/display-config/display-config.repository';
 import type { OdometerRepository } from './odometer.repository';
+import { createRoutePreview, type RoutePreview } from './route-preview';
 
 export interface OdometerService {
   getOdometer(): Promise<OdometerResponse>;
@@ -34,6 +35,8 @@ export interface LatestActivityResponse {
   startDate: string;
   startDateLocal: string | null;
   sportType: string;
+  summaryPolyline: string | null;
+  routePreview: RoutePreview | null;
 }
 
 export interface RecentOdometerResponse {
@@ -88,7 +91,9 @@ export function createOdometerService(
               averageSpeedMetersPerSecond: totals.latestActivity.averageSpeedMetersPerSecond,
               startDate: totals.latestActivity.startDate,
               startDateLocal: totals.latestActivity.startDateLocal,
-              sportType: totals.latestActivity.sportType
+              sportType: totals.latestActivity.sportType,
+              summaryPolyline: totals.latestActivity.summaryPolyline,
+              routePreview: createRoutePreview(totals.latestActivity.summaryPolyline)
             }
           : null,
         recent: {

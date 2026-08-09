@@ -22,6 +22,7 @@ export function toStoredActivity(activity: StravaSummaryActivity): NewActivity {
     maxSpeedMetersPerSecond: activity.max_speed ?? null,
     averageHeartrate: activity.average_heartrate ?? null,
     maxHeartrate: activity.max_heartrate ?? null,
+    summaryPolyline: activity.map?.summary_polyline ?? null,
     updatedAt: nowIso()
   };
 }
