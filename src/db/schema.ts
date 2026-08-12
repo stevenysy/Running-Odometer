@@ -31,6 +31,7 @@ export const displayConfig = sqliteTable('display_config', {
   id: text('id').primaryKey(),
   nextRaceName: text('next_race_name'),
   nextRaceDate: text('next_race_date'),
+  timezoneOffsetMinutes: integer('timezone_offset_minutes').notNull().default(-300),
   updatedAt: text('updated_at').notNull()
 });
 

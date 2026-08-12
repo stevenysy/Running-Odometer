@@ -5,10 +5,6 @@
 
 #include "ui/core/variables.h"
 
-#ifndef RUNLOG_TIMEZONE_OFFSET_MINUTES
-#define RUNLOG_TIMEZONE_OFFSET_MINUTES 0
-#endif
-
 namespace {
 
 String formatFloat(float value, uint8_t decimals)
@@ -67,7 +63,7 @@ String formatDate(String isoDate)
     return String(buffer);
 }
 
-String formatUpdatedTime(String isoDate)
+String formatUpdatedTime(String isoDate, int32_t timezoneOffsetMinutes)
 {
     if (isoDate.length() < 16) {
         return "--";
@@ -75,7 +71,7 @@ String formatUpdatedTime(String isoDate)
 
     const int utcHour = isoDate.substring(11, 13).toInt();
     const int utcMinute = isoDate.substring(14, 16).toInt();
-    int localMinutes = utcHour * 60 + utcMinute + RUNLOG_TIMEZONE_OFFSET_MINUTES;
+    int localMinutes = utcHour * 60 + utcMinute + timezoneOffsetMinutes;
     localMinutes %= 24 * 60;
     if (localMinutes < 0) {
         localMinutes += 24 * 60;
@@ -130,6 +126,7 @@ RunLogDashboardData runlog_dashboard_fake_data()
     data.hasNextRace = true;
     data.nextRaceName = "ST. JUDE MEMPHIS MARATHON";
     data.nextRaceDaysUntil = 112;
+    data.timezoneOffsetMinutes = -300;
     data.lastUpdated = "2026-08-08T08:42:00Z";
     return data;
 }
@@ -168,7 +165,9 @@ String runlog_dashboard_signature(const RunLogDashboardData &data, const String 
     signature += "|";
     signature += data.hasNextRace ? String(data.nextRaceDaysUntil) : "--";
     signature += "|";
-    signature += formatUpdatedTime(data.lastUpdated);
+    signature += data.timezoneOffsetMinutes;
+    signature += "|";
+    signature += formatUpdatedTime(data.lastUpdated, data.timezoneOffsetMinutes);
     return signature;
 }
 
@@ -215,7 +214,8 @@ void runlog_dashboard_render(const RunLogDashboardData &data, const String &stat
              data.hasNextRace ? uppercaseLabel(data.nextRaceName) : "--");
 
     setLabel(GUI_Label__OdometerScreen__UpdatedTextLabel, statusText);
-    setLabel(GUI_Label__OdometerScreen__UpdatedTimeLabel, formatUpdatedTime(data.lastUpdated));
+    setLabel(GUI_Label__OdometerScreen__UpdatedTimeLabel,
+             formatUpdatedTime(data.lastUpdated, data.timezoneOffsetMinutes));
 
     e1001_display_schedule_refresh(display);
 }

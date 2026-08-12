@@ -113,6 +113,11 @@ bool parseOdometerPayload(const String &payload, RunLogDashboardData *data, Stri
         *errorMessage = "missing generatedAt";
         return false;
     }
+    if (doc["timezoneOffsetMinutes"].isNull()) {
+        *errorMessage = "missing timezone";
+        return false;
+    }
+    data->timezoneOffsetMinutes = doc["timezoneOffsetMinutes"] | 0;
     data->lastUpdated = doc["generatedAt"] | "";
     return true;
 }

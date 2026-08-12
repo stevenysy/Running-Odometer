@@ -9,11 +9,13 @@ export interface DisplayConfigService {
 export interface SaveDisplayConfigInput {
   nextRaceName: string | null;
   nextRaceDate: string | null;
+  timezoneOffsetMinutes?: number;
 }
 
 export interface DisplayConfigResponse {
   nextRaceName: string | null;
   nextRaceDate: string | null;
+  timezoneOffsetMinutes: number;
   nextRace: NextRaceResponse | null;
   updatedAt: string | null;
 }
@@ -26,6 +28,7 @@ export interface NextRaceResponse {
 
 const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
+export const DEFAULT_TIMEZONE_OFFSET_MINUTES = -300;
 
 export function createDisplayConfigService(
   repository: DisplayConfigRepository
@@ -39,6 +42,7 @@ export function createDisplayConfigService(
       const config = await repository.upsertConfig({
         nextRaceName: input.nextRaceName,
         nextRaceDate: input.nextRaceDate,
+        timezoneOffsetMinutes: input.timezoneOffsetMinutes ?? DEFAULT_TIMEZONE_OFFSET_MINUTES,
         updatedAt: now.toISOString()
       });
 
@@ -88,6 +92,7 @@ function toDisplayConfigResponse(
   return {
     nextRaceName: config?.nextRaceName ?? null,
     nextRaceDate: config?.nextRaceDate ?? null,
+    timezoneOffsetMinutes: config?.timezoneOffsetMinutes ?? DEFAULT_TIMEZONE_OFFSET_MINUTES,
     nextRace: toNextRaceResponse(config?.nextRaceName ?? null, config?.nextRaceDate ?? null, now),
     updatedAt: config?.updatedAt ?? null
   };

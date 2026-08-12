@@ -7,4 +7,3 @@ build_flags =
     -D RUNLOG_WIFI_PASSWORD=\"your-wifi-password\"
     -D RUNLOG_API_URL=\"https://your-worker.example.workers.dev\"
     -D RUNLOG_API_KEY=\"your-api-key\"
-    -D RUNLOG_TIMEZONE_OFFSET_MINUTES=-300

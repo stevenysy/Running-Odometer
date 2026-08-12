@@ -12,7 +12,8 @@ export const displayConfigRoutes = new Hono<AppContext>();
 const displayConfigSchema = z
   .object({
     nextRaceName: z.string().trim().min(1).nullable(),
-    nextRaceDate: z.string().refine(isValidDateOnly, 'Expected YYYY-MM-DD').nullable()
+    nextRaceDate: z.string().refine(isValidDateOnly, 'Expected YYYY-MM-DD').nullable(),
+    timezoneOffsetMinutes: z.number().int().min(-720).max(840).optional()
   })
   .refine(
     (config) =>
@@ -42,8 +43,19 @@ displayConfigRoutes.put('/display-config', requireApiKey, async (c) => {
   const displayConfigService = createDisplayConfigService(
     createDisplayConfigRepository(createDb(c.env.DB))
   );
+  const saveInput =
+    parsedBody.data.timezoneOffsetMinutes === undefined
+      ? {
+          nextRaceName: parsedBody.data.nextRaceName,
+          nextRaceDate: parsedBody.data.nextRaceDate
+        }
+      : {
+          nextRaceName: parsedBody.data.nextRaceName,
+          nextRaceDate: parsedBody.data.nextRaceDate,
+          timezoneOffsetMinutes: parsedBody.data.timezoneOffsetMinutes
+        };
 
-  return c.json(await displayConfigService.saveConfig(parsedBody.data));
+  return c.json(await displayConfigService.saveConfig(saveInput));
 });
 
 async function readJsonBody(request: Request): Promise<unknown> {

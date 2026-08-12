@@ -12,6 +12,7 @@ export interface DisplayConfigRepository {
 export interface DisplayConfigInput {
   nextRaceName: string | null;
   nextRaceDate: string | null;
+  timezoneOffsetMinutes: number;
   updatedAt: string;
 }
 
@@ -34,6 +35,7 @@ export function createDisplayConfigRepository(db: DbClient): DisplayConfigReposi
           id: DISPLAY_CONFIG_ID,
           nextRaceName: input.nextRaceName,
           nextRaceDate: input.nextRaceDate,
+          timezoneOffsetMinutes: input.timezoneOffsetMinutes,
           updatedAt: input.updatedAt
         })
         .onConflictDoUpdate({
@@ -41,6 +43,7 @@ export function createDisplayConfigRepository(db: DbClient): DisplayConfigReposi
           set: {
             nextRaceName: input.nextRaceName,
             nextRaceDate: input.nextRaceDate,
+            timezoneOffsetMinutes: input.timezoneOffsetMinutes,
             updatedAt: input.updatedAt
           }
         })

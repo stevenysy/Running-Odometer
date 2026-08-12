@@ -1,4 +1,8 @@
-import { toNextRaceResponse, type NextRaceResponse } from '@/display-config/display-config.service';
+import {
+  DEFAULT_TIMEZONE_OFFSET_MINUTES,
+  toNextRaceResponse,
+  type NextRaceResponse
+} from '@/display-config/display-config.service';
 import type { DisplayConfigRepository } from '@/display-config/display-config.repository';
 import type { OdometerRepository } from './odometer.repository';
 import { createRoutePreview, type RoutePreview } from './route-preview';
@@ -12,6 +16,7 @@ export interface OdometerResponse {
   distanceKm: number;
   lastUpdated: string | null;
   generatedAt: string;
+  timezoneOffsetMinutes: number;
   activityCount: number;
   movingTimeSeconds: number;
   elapsedTimeSeconds: number;
@@ -83,6 +88,8 @@ export function createOdometerService(
         distanceKm: totals.distanceMeters / 1000,
         lastUpdated: totals.lastUpdated,
         generatedAt,
+        timezoneOffsetMinutes:
+          displayConfig?.timezoneOffsetMinutes ?? DEFAULT_TIMEZONE_OFFSET_MINUTES,
         activityCount: totals.activityCount,
         movingTimeSeconds: totals.movingTimeSeconds,
         elapsedTimeSeconds: totals.elapsedTimeSeconds,

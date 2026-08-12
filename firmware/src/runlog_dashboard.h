@@ -26,6 +26,7 @@ struct RunLogDashboardData {
     bool hasNextRace;
     String nextRaceName;
     int32_t nextRaceDaysUntil;
+    int32_t timezoneOffsetMinutes;
     String lastUpdated;
 };
 
