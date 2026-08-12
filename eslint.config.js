@@ -22,6 +22,6 @@ export default tseslint.config(
     }
   },
   {
-    ignores: ['dist', '.wrangler', 'node_modules', 'migrations', 'eslint.config.js']
+    ignores: ['dist', '.wrangler', 'node_modules', 'migrations', 'firmware/.pio', 'eslint.config.js']
   }
 );

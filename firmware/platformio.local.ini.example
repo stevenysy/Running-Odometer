@@ -1,0 +1,10 @@
+; Copy this file to platformio.local.ini and fill in your local values.
+; platformio.local.ini is ignored by git.
+
+[runlog_secrets]
+build_flags =
+    -D RUNLOG_WIFI_SSID=\"your-wifi-name\"
+    -D RUNLOG_WIFI_PASSWORD=\"your-wifi-password\"
+    -D RUNLOG_API_URL=\"https://your-worker.example.workers.dev\"
+    -D RUNLOG_API_KEY=\"your-api-key\"
+    -D RUNLOG_TIMEZONE_OFFSET_MINUTES=-300

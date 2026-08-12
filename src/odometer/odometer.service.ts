@@ -11,6 +11,7 @@ export interface OdometerResponse {
   distanceMeters: number;
   distanceKm: number;
   lastUpdated: string | null;
+  generatedAt: string;
   activityCount: number;
   movingTimeSeconds: number;
   elapsedTimeSeconds: number;
@@ -71,6 +72,7 @@ export function createOdometerService(
 ): OdometerService {
   return {
     async getOdometer() {
+      const generatedAt = new Date().toISOString();
       const [totals, displayConfig] = await Promise.all([
         repository.getTotals(),
         displayConfigRepository.getConfig()
@@ -80,6 +82,7 @@ export function createOdometerService(
         distanceMeters: totals.distanceMeters,
         distanceKm: totals.distanceMeters / 1000,
         lastUpdated: totals.lastUpdated,
+        generatedAt,
         activityCount: totals.activityCount,
         movingTimeSeconds: totals.movingTimeSeconds,
         elapsedTimeSeconds: totals.elapsedTimeSeconds,
