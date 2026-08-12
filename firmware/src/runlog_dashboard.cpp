@@ -44,7 +44,7 @@ String paceText(uint32_t secondsPerKm)
 
 String formatLastRunDistance(float distanceKm, bool hasPace, uint32_t secondsPerKm)
 {
-    String value = formatFloat(distanceKm, 1);
+    String value = formatFloat(distanceKm, distanceKm < 10.0f ? 2 : 1);
     const uint8_t targetKmColumn = hasPace ? paceText(secondsPerKm).length() + 2 : value.length() + 1;
 
     while (value.length() < targetKmColumn) {
