@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "tft_espi_esp32_c3.c": "cpp"
+    },
+    "cmake.sourceDirectory": "/Users/stevenysy/Downloads/weather_gray/src/ui"
+}
