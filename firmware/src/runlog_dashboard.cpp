@@ -28,18 +28,35 @@ String formatDuration(uint32_t seconds)
     if (hours > 0) {
         snprintf(buffer, sizeof(buffer), "%luh %lum", (unsigned long)hours, (unsigned long)minutes);
     } else {
-        snprintf(buffer, sizeof(buffer), "%lum", (unsigned long)minutes);
+        snprintf(buffer, sizeof(buffer), "%lu m", (unsigned long)minutes);
     }
 
     return String(buffer);
 }
 
-String formatPace(uint32_t secondsPerKm)
+String paceText(uint32_t secondsPerKm)
 {
-    char buffer[24];
-    snprintf(buffer, sizeof(buffer), "%lu:%02lu /km", (unsigned long)(secondsPerKm / 60),
+    char buffer[16];
+    snprintf(buffer, sizeof(buffer), "%lu:%02lu", (unsigned long)(secondsPerKm / 60),
              (unsigned long)(secondsPerKm % 60));
     return String(buffer);
+}
+
+String formatLastRunDistance(float distanceKm, bool hasPace, uint32_t secondsPerKm)
+{
+    String value = formatFloat(distanceKm, 1);
+    const uint8_t targetKmColumn = hasPace ? paceText(secondsPerKm).length() + 2 : value.length() + 1;
+
+    while (value.length() < targetKmColumn) {
+        value += " ";
+    }
+
+    return value + "km";
+}
+
+String formatLastRunPace(uint32_t secondsPerKm)
+{
+    return paceText(secondsPerKm) + " /km";
 }
 
 String formatDate(String isoDate)
@@ -153,11 +170,15 @@ String runlog_dashboard_signature(const RunLogDashboardData &data, const String 
     signature += "|";
     signature += data.hasLatestActivity ? formatDate(data.latestActivityStartDate) : "--";
     signature += "|";
-    signature += data.hasLatestActivity ? formatFloat(data.latestActivityDistanceKm, 1) : "--";
+    signature += data.hasLatestActivity
+                     ? formatLastRunDistance(data.latestActivityDistanceKm,
+                                             data.hasLatestActivityPace,
+                                             data.latestActivityPaceSecondsPerKm)
+                     : "--";
     signature += "|";
     signature += data.latestActivityMovingTimeSeconds;
     signature += "|";
-    signature += data.hasLatestActivityPace ? formatPace(data.latestActivityPaceSecondsPerKm) : "--";
+    signature += data.hasLatestActivityPace ? formatLastRunPace(data.latestActivityPaceSecondsPerKm) : "--";
     signature += "|";
     signature += data.hasLatestActivityElevation ? String(data.latestActivityElevationMeters) : "--";
     signature += "|";
@@ -195,12 +216,16 @@ void runlog_dashboard_render(const RunLogDashboardData &data, const String &stat
     setLabel(GUI_Label__OdometerScreen__LastRunDateLabel,
              data.hasLatestActivity ? formatDate(data.latestActivityStartDate) : "--");
     setLabel(GUI_Label__OdometerScreen__LastRunDistanceLabel,
-             data.hasLatestActivity ? formatFloat(data.latestActivityDistanceKm, 1) + " km" : "--");
+             data.hasLatestActivity
+                 ? formatLastRunDistance(data.latestActivityDistanceKm,
+                                         data.hasLatestActivityPace,
+                                         data.latestActivityPaceSecondsPerKm)
+                 : "--");
     setLabel(GUI_Label__OdometerScreen__LastRunTimeLabel,
              data.hasLatestActivity ? formatDuration(data.latestActivityMovingTimeSeconds) : "--");
     setLabel(GUI_Label__OdometerScreen__LastRunPaceLabel,
              data.hasLatestActivity && data.hasLatestActivityPace
-                 ? formatPace(data.latestActivityPaceSecondsPerKm)
+                 ? formatLastRunPace(data.latestActivityPaceSecondsPerKm)
                  : "--");
     setLabel(GUI_Label__OdometerScreen__LastRunElevationLabel,
              data.hasLatestActivity && data.hasLatestActivityElevation
