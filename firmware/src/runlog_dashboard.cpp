@@ -118,6 +118,15 @@ void setLabel(lv_obj_t *label, const String &value)
     lv_label_set_text(label, value.c_str());
 }
 
+void setVisible(lv_obj_t *object, bool visible)
+{
+    if (visible) {
+        lv_obj_remove_flag(object, LV_OBJ_FLAG_HIDDEN);
+    } else {
+        lv_obj_add_flag(object, LV_OBJ_FLAG_HIDDEN);
+    }
+}
+
 } // namespace
 
 RunLogDashboardData runlog_dashboard_fake_data()
@@ -148,9 +157,12 @@ RunLogDashboardData runlog_dashboard_fake_data()
     return data;
 }
 
-String runlog_dashboard_signature(const RunLogDashboardData &data, const String &statusText)
+String runlog_dashboard_signature(const RunLogDashboardData &data, const String &statusText,
+                                  bool wifiConnected)
 {
     String signature = statusText;
+    signature += "|";
+    signature += wifiConnected ? "wifi" : "no-wifi";
     signature += "|";
     signature += formatFloat(data.distanceKm, 1);
     signature += "|";
@@ -193,7 +205,7 @@ String runlog_dashboard_signature(const RunLogDashboardData &data, const String 
 }
 
 void runlog_dashboard_render(const RunLogDashboardData &data, const String &statusText,
-                             e1001_driver_t *display)
+                             bool wifiConnected, e1001_driver_t *display)
 {
     setLabel(GUI_Label__OdometerScreen__DistanceValueLabel, formatFloat(data.distanceKm, 1));
     setLabel(GUI_Label__OdometerScreen__DistanceUnitLabel, "km");
@@ -241,6 +253,8 @@ void runlog_dashboard_render(const RunLogDashboardData &data, const String &stat
     setLabel(GUI_Label__OdometerScreen__UpdatedTextLabel, statusText);
     setLabel(GUI_Label__OdometerScreen__UpdatedTimeLabel,
              formatUpdatedTime(data.lastUpdated, data.timezoneOffsetMinutes));
+    setVisible(GUI_Image__OdometerScreen__WifiIcon, wifiConnected);
+    setVisible(GUI_Image__OdometerScreen__NoWifiIcon, !wifiConnected);
 
     e1001_display_schedule_refresh(display);
 }

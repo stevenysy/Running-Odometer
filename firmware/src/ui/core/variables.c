@@ -46,3 +46,6 @@ lv_obj_t *GUI_Label__OdometerScreen__DaysUntilTextLabel;
 lv_obj_t *GUI_Label__OdometerScreen__NextRaceLabel;
 lv_obj_t *GUI_Label__OdometerScreen__UpdatedTextLabel;
 lv_obj_t *GUI_Label__OdometerScreen__UpdatedTimeLabel;
+lv_obj_t *GUI_Label__OdometerScreen__IndoorRunLabel;
+lv_obj_t *GUI_Image__OdometerScreen__WifiIcon;
+lv_obj_t *GUI_Image__OdometerScreen__NoWifiIcon;

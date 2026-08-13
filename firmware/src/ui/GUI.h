@@ -23,5 +23,7 @@ LV_FONT_DECLARE(jbm16);
 LV_IMG_DECLARE(upload_timer_png);
 LV_IMG_DECLARE(upload_sportshoe_1_png);
 LV_IMG_DECLARE(upload_triangleright_png);
+LV_IMG_DECLARE(upload_wifi_png);
+LV_IMG_DECLARE(upload_wifioff_png);
 
 #endif

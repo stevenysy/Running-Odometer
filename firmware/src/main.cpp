@@ -1,4 +1,5 @@
 #include <lvgl.h>
+#include <WiFi.h>
 
 #include "e1001_display.h"
 #include "runlog_api.h"
@@ -41,13 +42,14 @@ void _lvgl_task(void* p)
 
 void render_dashboard(const String &statusText)
 {
-    const String nextSignature = runlog_dashboard_signature(dashboard_data, statusText);
+    const bool wifiConnected = WiFi.status() == WL_CONNECTED;
+    const String nextSignature = runlog_dashboard_signature(dashboard_data, statusText, wifiConnected);
     if (nextSignature == last_render_signature) {
         return;
     }
 
     lock_lvgl();
-    runlog_dashboard_render(dashboard_data, statusText, &e1001_driver);
+    runlog_dashboard_render(dashboard_data, statusText, wifiConnected, &e1001_driver);
     unlock_lvgl();
     last_render_signature = nextSignature;
 }

@@ -237,6 +237,26 @@ void GUI_initScreen__OdometerScreen() {
     lv_obj_set_pos(GUI_Label__OdometerScreen__UpdatedTimeLabel, 70, -6);
     lv_obj_set_size(GUI_Label__OdometerScreen__UpdatedTimeLabel, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
 
+    GUI_Label__OdometerScreen__IndoorRunLabel = lv_label_create(GUI_Screen__OdometerScreen);
+    lv_label_set_long_mode(GUI_Label__OdometerScreen__IndoorRunLabel, LV_LABEL_LONG_WRAP);
+    lv_obj_set_align(GUI_Label__OdometerScreen__IndoorRunLabel, LV_ALIGN_RIGHT_MID);
+    lv_obj_set_pos(GUI_Label__OdometerScreen__IndoorRunLabel, -105, 20);
+    lv_obj_set_size(GUI_Label__OdometerScreen__IndoorRunLabel, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+
+    GUI_Image__OdometerScreen__WifiIcon = lv_image_create(GUI_Screen__OdometerScreen);
+    lv_obj_add_flag(GUI_Image__OdometerScreen__WifiIcon, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_remove_flag(GUI_Image__OdometerScreen__WifiIcon, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_align(GUI_Image__OdometerScreen__WifiIcon, LV_ALIGN_BOTTOM_LEFT);
+    lv_obj_set_pos(GUI_Image__OdometerScreen__WifiIcon, 135, -5);
+    lv_obj_set_size(GUI_Image__OdometerScreen__WifiIcon, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+
+    GUI_Image__OdometerScreen__NoWifiIcon = lv_image_create(GUI_Screen__OdometerScreen);
+    lv_obj_add_flag(GUI_Image__OdometerScreen__NoWifiIcon, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_remove_flag(GUI_Image__OdometerScreen__NoWifiIcon, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_align(GUI_Image__OdometerScreen__NoWifiIcon, LV_ALIGN_BOTTOM_LEFT);
+    lv_obj_set_pos(GUI_Image__OdometerScreen__NoWifiIcon, 135, -5);
+    lv_obj_set_size(GUI_Image__OdometerScreen__NoWifiIcon, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+
     GUI_initScreenStyles__OdometerScreen();
     GUI_initScreenTexts__OdometerScreen();
 }
@@ -277,6 +297,7 @@ void GUI_initScreenTexts__OdometerScreen() {
     lv_label_set_text_static(GUI_Label__OdometerScreen__NextRaceLabel, "ST. JUDE MEMPHIS MARATHON");
     lv_label_set_text_static(GUI_Label__OdometerScreen__UpdatedTextLabel, "UPDATED");
     lv_label_set_text_static(GUI_Label__OdometerScreen__UpdatedTimeLabel, "8:42 AM");
+    lv_label_set_text_static(GUI_Label__OdometerScreen__IndoorRunLabel, "INDOOR RUN");
 }
 
 void GUI_initScreenStyles__OdometerScreen() {
@@ -786,4 +807,19 @@ void GUI_initScreenStyles__OdometerScreen() {
     lv_obj_add_style(GUI_Label__OdometerScreen__UpdatedTimeLabel,
                      &GUI_Style__Label__OdometerScreen__UpdatedTimeLabel__MAIN_DEFAULT,
                      LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    static lv_style_t GUI_Style__Label__OdometerScreen__IndoorRunLabel__MAIN_DEFAULT;
+    lv_style_init(&GUI_Style__Label__OdometerScreen__IndoorRunLabel__MAIN_DEFAULT);
+    lv_style_set_text_font(&GUI_Style__Label__OdometerScreen__IndoorRunLabel__MAIN_DEFAULT, &jbm16);
+    lv_style_set_text_color(&GUI_Style__Label__OdometerScreen__IndoorRunLabel__MAIN_DEFAULT, lv_color_make(0, 0, 0));
+    lv_style_set_text_opa(&GUI_Style__Label__OdometerScreen__IndoorRunLabel__MAIN_DEFAULT, 255);
+    lv_style_set_text_letter_space(&GUI_Style__Label__OdometerScreen__IndoorRunLabel__MAIN_DEFAULT, 0);
+    lv_style_set_text_line_space(&GUI_Style__Label__OdometerScreen__IndoorRunLabel__MAIN_DEFAULT, -2);
+    lv_style_set_text_align(&GUI_Style__Label__OdometerScreen__IndoorRunLabel__MAIN_DEFAULT, LV_TEXT_ALIGN_LEFT);
+    lv_obj_add_style(GUI_Label__OdometerScreen__IndoorRunLabel,
+                     &GUI_Style__Label__OdometerScreen__IndoorRunLabel__MAIN_DEFAULT, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_image_set_src(GUI_Image__OdometerScreen__WifiIcon, &upload_wifi_png);
+
+    lv_image_set_src(GUI_Image__OdometerScreen__NoWifiIcon, &upload_wifioff_png);
 }

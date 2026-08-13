@@ -31,8 +31,9 @@ struct RunLogDashboardData {
 };
 
 RunLogDashboardData runlog_dashboard_fake_data();
-String runlog_dashboard_signature(const RunLogDashboardData &data, const String &statusText);
+String runlog_dashboard_signature(const RunLogDashboardData &data, const String &statusText,
+                                  bool wifiConnected);
 void runlog_dashboard_render(const RunLogDashboardData &data, const String &statusText,
-                             e1001_driver_t *display);
+                             bool wifiConnected, e1001_driver_t *display);
 
 #endif

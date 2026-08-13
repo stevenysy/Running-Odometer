@@ -8,6 +8,8 @@ SET( SOURCES
     assets/images/upload_sportshoe_1_png.c
     assets/images/upload_timer_png.c
     assets/images/upload_triangleright_png.c
+    assets/images/upload_wifi_png.c
+    assets/images/upload_wifioff_png.c
     behavior/animations.c
     behavior/events.c
     components/comp.c

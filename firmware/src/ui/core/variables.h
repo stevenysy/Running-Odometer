@@ -53,6 +53,9 @@ extern lv_obj_t *GUI_Label__OdometerScreen__DaysUntilTextLabel;
 extern lv_obj_t *GUI_Label__OdometerScreen__NextRaceLabel;
 extern lv_obj_t *GUI_Label__OdometerScreen__UpdatedTextLabel;
 extern lv_obj_t *GUI_Label__OdometerScreen__UpdatedTimeLabel;
+extern lv_obj_t *GUI_Label__OdometerScreen__IndoorRunLabel;
+extern lv_obj_t *GUI_Image__OdometerScreen__WifiIcon;
+extern lv_obj_t *GUI_Image__OdometerScreen__NoWifiIcon;
 
 #ifdef __cplusplus
 } /*extern "C"*/
