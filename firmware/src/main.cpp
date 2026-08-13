@@ -8,12 +8,26 @@
 
 namespace {
 
-constexpr uint32_t FETCH_INTERVAL_MS = 15UL * 60UL * 1000UL;
+#ifndef RUNLOG_REFRESH_BUTTON_PIN
+#define RUNLOG_REFRESH_BUTTON_PIN 3
+#endif
+
+#ifndef RUNLOG_REFRESH_BUTTON_ACTIVE_LOW
+#define RUNLOG_REFRESH_BUTTON_ACTIVE_LOW 1
+#endif
+
+constexpr uint32_t FETCH_INTERVAL_MS = 60UL * 60UL * 1000UL;
+constexpr uint32_t REFRESH_BUTTON_DEBOUNCE_MS = 50;
+constexpr uint32_t REFRESH_BUTTON_COOLDOWN_MS = 2000;
 
 e1001_driver_t e1001_driver;
 SemaphoreHandle_t lvgl_mutex;
 RunLogDashboardData dashboard_data;
 uint32_t last_fetch_attempt_ms = 0;
+uint32_t last_refresh_button_change_ms = 0;
+uint32_t last_manual_fetch_ms = 0;
+bool last_refresh_button_reading = HIGH;
+bool refresh_button_stable_state = HIGH;
 String last_render_signature;
 
 void lock_lvgl()
@@ -94,6 +108,45 @@ void fetch_dashboard()
     render_dashboard(errorMessage == "missing config" ? "CONFIG" : "API ERR");
 }
 
+bool is_refresh_button_pressed(int reading)
+{
+#if RUNLOG_REFRESH_BUTTON_ACTIVE_LOW
+    return reading == LOW;
+#else
+    return reading == HIGH;
+#endif
+}
+
+void handle_refresh_button()
+{
+    const bool reading = digitalRead(RUNLOG_REFRESH_BUTTON_PIN);
+    const uint32_t now = millis();
+
+    if (reading != last_refresh_button_reading) {
+        last_refresh_button_change_ms = now;
+        last_refresh_button_reading = reading;
+    }
+
+    if (now - last_refresh_button_change_ms < REFRESH_BUTTON_DEBOUNCE_MS) {
+        return;
+    }
+
+    if (reading == refresh_button_stable_state) {
+        return;
+    }
+
+    const bool wasPressed = is_refresh_button_pressed(refresh_button_stable_state);
+    const bool isPressed = is_refresh_button_pressed(reading);
+    refresh_button_stable_state = reading;
+
+    if (!wasPressed && isPressed && (last_manual_fetch_ms == 0 || now - last_manual_fetch_ms >= REFRESH_BUTTON_COOLDOWN_MS)) {
+        last_manual_fetch_ms = now;
+        Serial1.println("Refresh button pressed; fetching now...");
+        Serial1.flush();
+        fetch_dashboard();
+    }
+}
+
 } // namespace
 
 void setup()
@@ -103,6 +156,9 @@ void setup()
 
     lvgl_mutex = xSemaphoreCreateMutex();
     dashboard_data = runlog_dashboard_fake_data();
+    pinMode(RUNLOG_REFRESH_BUTTON_PIN, INPUT_PULLUP);
+    last_refresh_button_reading = digitalRead(RUNLOG_REFRESH_BUTTON_PIN);
+    refresh_button_stable_state = last_refresh_button_reading;
 
     e1001_display_init(&e1001_driver);
     GUI_init();
@@ -115,6 +171,8 @@ void setup()
 
 void loop()
 {
+    handle_refresh_button();
+
     if (millis() - last_fetch_attempt_ms >= FETCH_INTERVAL_MS) {
         fetch_dashboard();
     }
